@@ -1,6 +1,15 @@
-import React from 'react';
+import {React, useState} from 'react';
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import { Link } from 'react-router-dom'
+import styles from '../../styles/styles';
+
 
 const Login = () => {
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+
   return (
     <div className='min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8'>    
       <div className='sm:mx-auto sm:w-full sm:max-w-md'>
@@ -11,9 +20,11 @@ const Login = () => {
       
       <div className='mt-8 sm:mx-auto sm:w-full sm:max-w-md'>
         <div className='bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10'>
-          <form className='space-y-6' action='#' method='POST'>
+          <form className='space-y-6' >
             <div>
-              <label htmlFor='email' className='block text-sm font-medium text-gray-700'>
+              <label 
+                htmlFor='email' 
+                className='block text-sm font-medium text-gray-700'>
                 Correo electrónico
               </label>
               <div className='mt-1'>
@@ -23,36 +34,59 @@ const Login = () => {
                   type='email' 
                   autoComplete='email' 
                   required 
+                  value= {email}
+                  onChange={e => setEmail(e.target.value)}
                   className='appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm' 
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor='password' className='block text-sm font-medium text-gray-700'>
+              <label 
+                htmlFor='password' 
+                className='block text-sm font-medium text-gray-700'>
                 Contraseña
               </label>
-              <div className='mt-1'>
+              <div className='mt-1 relative'>
                 <input 
                   id='password' 
                   name='password' 
-                  type='password' 
+                  type= {showPassword ? 'text' : 'password'}
                   autoComplete='current-password' 
                   required 
+                  value= {password}
+                  onChange={e => setPassword(e.target.value)}
                   className='appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm' 
                 />
+                {
+                  showPassword ? (
+                    <AiOutlineEye
+                  className='absolute right-2 top-2 cursor-pointer'
+                  size={25}
+                  onClick={() => setShowPassword(false)}
+                />
+                  ) : (
+                    <AiOutlineEyeInvisible
+                  className='absolute right-2 top-2 cursor-pointer'
+                  size={25}
+                  onClick={() => setShowPassword(true)} 
+                  />
+                  )
+                }
               </div>
             </div>
 
-            <div className='flex items-center justify-between'>
-              <div className='flex items-center'>
+            <div className={`${styles.normalFlex} justify-between`}>
+              <div className={`${styles.normalFlex} `}>
                 <input 
-                  id='remember_me' 
-                  name='remember_me' 
+                  id='rememberMe' 
+                  name='rememberMe' 
                   type='checkbox' 
                   className='h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded' 
                 />
-                <label htmlFor='remember_me' className='ml-2 block text-sm text-gray-900'>
+                <label 
+                  htmlFor='rememberMe' 
+                  className='ml-2 block text-sm text-gray-900'>
                   Recuérdame
                 </label>
               </div>
@@ -71,7 +105,14 @@ const Login = () => {
                 Ingresar
               </button>     
             </div>
-          </form> {/* Cierre correcto del form */}
+            <div className={`${styles.normalFlex} w-full`}>
+              <h4>¿No tienes cuenta?</h4>
+              <Link to="/sign-up" 
+                className="text-blue-600 pl-2">
+                Regístrate
+              </Link>
+            </div>
+          </form> 
         </div>
       </div>
     </div>
