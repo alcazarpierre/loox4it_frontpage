@@ -1,6 +1,8 @@
 import {React, useState} from 'react';
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import logo from '../../assets/Logo.png'
+import axios from 'axios';
 import styles from '../../styles/styles';
 
 
@@ -9,18 +11,60 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState ('');
+  const navigate = useNavigate();
+
+  const URL = import.meta.env.VITE_API_URL;
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    if (!email || !password) {
+      return alert("Por favor completa todos los campos.");
+    }
+
+    try {
+      const response = await axios.post(`${URL}/auth/login`, {
+        email,
+        password,
+      });
+
+      localStorage.setItem('token', response.data.token);
+
+      alert("Inicio de sesión exitoso");
+      navigate("/profile");
+
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        alert(error.response?.data?.message || "Error al iniciar sesión");
+      } else {
+        console.error(error);
+        alert("Ocurrió un error inesperado");
+      }
+    }
+  };
 
   return (
-    <div className='min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8'>    
+    <div className='min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8'>
       <div className='sm:mx-auto sm:w-full sm:max-w-md'>
-        <h2 className='mt-6 text-center text-3xl font-extrabold text-gray-900'>
+      <div className="flex flex-col items-center">
+        <img 
+          src={logo} 
+          alt="Logo" 
+          className="w-32 h-32 object-contain mb-4 sm:w-36 sm:h-36 md:w-40 md:h-40"
+        />
+        <h2 className='text-center text-2xl sm:text-3xl font-extrabold text-gray-900'>
           Ingresa a tu cuenta
         </h2>
+      </div>
+
       </div>
       
       <div className='mt-8 sm:mx-auto sm:w-full sm:max-w-md'>
         <div className='bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10'>
-          <form className='space-y-6' >
+          <form 
+            onSubmit={handleLogin}
+            className='space-y-6' >
             <div>
               <label 
                 htmlFor='email' 
@@ -52,10 +96,11 @@ const Login = () => {
                   id='password' 
                   name='password' 
                   type= {showPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
                   autoComplete='current-password' 
                   required 
                   value= {password}
-                  onChange={e => setPassword(e.target.value)}
+                  onChange={(e) => setPassword(e.target.value)}
                   className='appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm' 
                 />
                 {

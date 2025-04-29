@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import axios from 'axios';
 import styles from '../../styles/styles';
 import { RxAvatar } from 'react-icons/rx';
 
@@ -9,20 +10,56 @@ const Signup = () => {
 
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [documentType, setDocumentType] = useState('DNI');
+  const [documentNumber, setDocumentNumber] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [avatar, setAvatar] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleFileInputChange = (e) => {
+    const file = e.target.files[0];
     const reader = new FileReader();
-    reader.onload = () => {
-        if(reader.readyState === 2){
-            setAvatar(reader.result);
-        }
+    reader.onloadend = () => {
+        setAvatar(reader.result);
     };
-    reader.readAsDataURL(e.target.files[0]);
+    if (file) {
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const URL = import.meta.env.VITE_API_URL;
+
+  const handleSignup = async (e) => {
+    e.preventDefault();
+
+    if (password !== confirmPassword) { 
+      setError('Las contraseñas no coinciden'); 
+      return; 
+    }
+
+    try {
+      const formData = {
+        firstName,
+        lastName,
+        documentType,
+        documentNumber,
+        phone,
+        email,
+        password,
+        avatar
+      };
+
+      await axios.post(`${URL}/auth/register`, formData);
+      navigate('/login');
+    } catch (error) {
+      console.error(error);
+      setError('Hubo un error al registrarte. Intenta de nuevo.');
+    }
   };
 
   return (
@@ -35,7 +72,9 @@ const Signup = () => {
       
       <div className='mt-8 sm:mx-auto sm:w-full sm:max-w-md'>
         <div className='bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10'>
-          <form className='space-y-6' >
+          <form 
+            className='space-y-6'
+            onSubmit={handleSignup} >
             <div>
               <label 
                 htmlFor='firstName' 
@@ -74,6 +113,34 @@ const Signup = () => {
                   className='appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm' 
                 />
               </div>
+            </div>
+
+            <div>
+              <label htmlFor='documentType' className='block text-sm font-medium text-gray-700'>Tipo de Documento</label>
+              <select
+                id='documentType'
+                name='documentType'
+                value={documentType}
+                onChange={(e) => setDocumentType(e.target.value)}
+                required
+                className='mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
+              >
+                <option value='DNI'>DNI</option>
+                <option value='CE'>CE</option>
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor='documentNumber' className='block text-sm font-medium text-gray-700'>Número de Documento</label>
+              <input
+                id='documentNumber'
+                name='documentNumber'
+                type='text'
+                required
+                value={documentNumber}
+                onChange={(e) => setDocumentNumber(e.target.value)}
+                className='mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
+              />
             </div>
 
             <div>
@@ -152,6 +219,24 @@ const Signup = () => {
               </div>
             </div>
 
+            <div> 
+              <label htmlFor='confirmPassword' className='block text-sm font-medium text-gray-700'>
+                Confirmar Contraseña
+              </label>
+              <div className='mt-1'>
+                <input
+                  id='confirmPassword'
+                  name='confirmPassword'
+                  type='password'
+                  autoComplete='new-password'
+                  required
+                  value={confirmPassword}
+                  onChange={e => setConfirmPassword(e.target.value)} 
+                  className='appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
+                />
+              </div>
+            </div>
+
             <div>
                 <label
                   htmlFor='avatar'
@@ -194,11 +279,16 @@ const Signup = () => {
                 Registrar
               </button>     
             </div>
+
+            {error && (
+              <p className='text-red-500 text-sm'>{error}</p>
+            )}
+
             <div className={`${styles.normalFlex} w-full`}>
               <h4>¿Ya tienes cuenta?</h4>
               <Link to="/login" 
                 className="text-blue-600 pl-2">
-                Ingresa
+                Ingresa aquí
               </Link>
             </div>
           </form> 
