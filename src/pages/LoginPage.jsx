@@ -1,10 +1,10 @@
 import React from 'react'
-import Login from '../components/Login/Login.jsx'
+import LoginForm from '../components/auth/LoginForm.jsx'
 
 const LoginPage = () => {
   return (
     <div>
-        <Login/>
+        <LoginForm/>
     </div>
   )
 }
